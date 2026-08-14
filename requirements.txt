@@ -1,0 +1,57 @@
+# ============================================================
+# AutoLabel-AI Pro 依赖清单
+# 作者：陈沫儒（沫沫）   更新时间：2026-08-14
+# 安装命令：pip install -r requirements.txt
+# 阿里源：pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/
+# ============================================================
+
+# ========== 核心 LLM 客户端（必装）==========
+zhipuai>=2.0.0              # 智谱 GLM-4 / GLM-4V
+openai>=1.0.0               # OpenAI 兼容接口（Qwen-VL 也用这个）
+dashscope>=1.14.0           # 阿里通义千问 Qwen-VL 官方 SDK
+requests>=2.31.0            # HTTP 请求
+httpx>=0.25.0               # 异步 HTTP（智谱 SDK 依赖）
+tenacity>=8.2.0             # 429 限流自动重试（降级策略核心）
+pydantic>=2.5.0             # 配置 schema 校验
+python-dotenv>=1.0.0        # 读取 .env 里的 API Key
+loguru>=0.7.0               # 彩色日志
+
+# ========== YOLOv8 目标检测（必装，简历亮点）==========
+ultralytics>=8.0.0          # YOLOv8 官方库（yolov8n/s/m/l/x）
+opencv-python>=4.8.0        # 图像处理 / bbox 绘制
+Pillow>=10.0.0              # 图像读写
+
+# ========== 数据处理 & 标注导出（必装）==========
+pandas>=2.0.0               # 表格处理
+numpy>=1.24.0               # 数组计算
+pyarrow>=14.0.0             # parquet 读写
+pycocotools>=2.0.7          # COCO 格式导出
+label-studio-sdk>=0.0.32    # Label Studio SDK（项目无缝对接）
+tqdm>=4.66.0                # 进度条
+rich>=13.6.0                # 终端美化
+
+# ========== Web 可视化（必装，Streamlit Demo）==========
+streamlit>=1.29.0           # Web Demo 页面
+streamlit-aggrid>=0.3.4     # 表格展示
+
+# ========== LoRA 微调（可选，简历话术）==========
+# 不强求本地跑通，留代码框架即可
+peft>=0.7.0                 # LoRA 工具
+transformers>=4.36.0        # HuggingFace 模型加载
+datasets>=2.14.0            # 数据集加载
+accelerate>=0.24.0          # 训练加速
+bitsandbytes>=0.41.0        # 4bit 量化（GPU 友好）
+
+# ========== 本地 VLM 推理（可选，需先装 Ollama）==========
+# Ollama 客户端：先到 https://ollama.com 下载安装 Ollama
+# 本机执行：ollama pull llava 即可本地跑 LLaVA
+ollama>=0.1.0
+
+# ========== 医学影像（拓展模块，可选）==========
+pydicom>=2.4.0              # DICOM 医学影像读写
+SimpleITK>=2.3.0            # 医学影像处理
+scikit-image>=0.22.0        # 显著性目标检测后处理
+
+# ========== 工具 =====
+matplotlib>=3.8.0           # 绘图（IoU 分布、漏标统计）
+seaborn>=0.13.0             # 统计图
