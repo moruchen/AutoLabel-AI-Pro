@@ -5,16 +5,11 @@ AutoLabel-AI Pro · YOLOv8 目标检测模块
 
 设计要点：
   1. 包装 ultralytics YOLOv8，对外暴露简单接口
-  2. 支持显著性目标检测迁移（用户硕士老本行，简历亮点）
+  2. 支持显著性目标检测迁移
   3. 输出统一格式（dict），供上层 VLM 联合标注使用
   4. 内置 COCO / LabelMe / YOLO txt 三种格式导出
-  5. 笔记本 CPU 即可跑 yolov8n（简历演示首选）
+  5. 笔记本 CPU 即可跑 yolov8n
 
-面试考点：
-  - YOLOv8 推理流程：preprocess → inference → postprocess（NMS）
-  - 显著性目标检测迁移：基础权重微调 → 病灶检测
-  - 多模型联合标注：YOLO 快速过滤 + VLM 漏检补充
-  - 性能指标：mAP / IoU / FPS
 """
 
 from __future__ import annotations
@@ -83,7 +78,7 @@ class BBox:
 @dataclass
 class DetectionResult:
     """单图检测结果"""
-    image_path: str
+    source: str
     width: int
     height: int
     boxes: list[BBox] = field(default_factory=list)
@@ -104,7 +99,7 @@ class DetectionResult:
     def filter_by_confidence(self, threshold: float) -> "DetectionResult":
         """按置信度过滤（不确定样本给 VLM 二审）"""
         return DetectionResult(
-            image_path=self.image_path,
+            source=self.image_path,
             width=self.width,
             height=self.height,
             boxes=[b for b in self.boxes if b.confidence >= threshold],
@@ -193,43 +188,47 @@ class YOLODetector:
 
     def detect(
         self,
-        image_path: str,
+        source: str,
         conf: float | None = None,
         iou: float | None = None,
         target_classes: list[str] | None = None,
+        save: bool = False,
+        save_dir: str = r"D:\pythonproject\LLM\AutoLabel-AI-Pro\scripts\runs\detect",
     ) -> DetectionResult:
         """
         单图检测
 
         Args:
-            image_path: 图片路径
+            source: 图片路径 / URL
             conf: 本次推理的置信度阈值（None 用默认）
             iou: 本次推理的 NMS IoU 阈值
             target_classes: 过滤的类别名列表（None=全部 80 类）
+            save: 是否保存标注后的图片到 save_dir
+            save_dir: 保存目录（默认 runs/detect/predict/）
 
         Returns:
             DetectionResult
         """
-        from PIL import Image
         start = time.time()
 
-        # 读取尺寸
-        with Image.open(image_path) as img:
-            w, h = img.size
-
-        # 推理
+        # 推理（save=True 时自动保存到 save_dir/predict/）
         results = self.model.predict(
-            source=image_path,
+            source=source,
             conf=conf or self.conf_threshold,
             iou=iou or self.iou_threshold,
             device=self.device,
+            save=save,
+            project=save_dir,
+            name="predict",
+            exist_ok=True,
             verbose=False,
         )
 
         # 解析结果
-        boxes: list[BBox] = []
         r = results[0]
+        boxes = []
         names = r.names  # {0: 'person', 1: 'bicycle', ...}
+        h, w = r.orig_shape  # (height, width)
 
         if r.boxes is not None and len(r.boxes) > 0:
             for box in r.boxes:
@@ -253,7 +252,7 @@ class YOLODetector:
 
         latency = int((time.time() - start) * 1000)
         return DetectionResult(
-            image_path=str(image_path),
+            source=str(source),
             width=w,
             height=h,
             boxes=boxes,
@@ -289,10 +288,10 @@ class YOLODetector:
         logger.info(f"[YOLODetector] 批量检测 {len(image_files)} 张图片")
 
         results = []
-        for img_path in image_files:
-            r = self.detect(str(img_path), target_classes=target_classes)
+        for source in image_files:
+            r = self.detect(str(source), target_classes=target_classes)
             results.append(r)
-            logger.debug(f"  {img_path.name}: {len(r.boxes)} boxes, {r.latency_ms}ms")
+            logger.debug(f"  {source.name}: {len(r.boxes)} boxes, {r.latency_ms}ms")
 
         if save_to:
             Path(save_to).parent.mkdir(parents=True, exist_ok=True)
@@ -309,25 +308,30 @@ class YOLODetector:
 
 
 # ============================================================
-# 3. 显著性目标检测迁移（用户硕士老本行 → 简历亮点）
+# 3. 显著性目标检测迁移
 # ============================================================
 class SalientYOLODetector(YOLODetector):
     """
     显著性目标检测迁移版本
-    - 用户硕士 3 年显著性目标检测研究，可复用方法论
-    - 思路：yolov8n 预训练 → ChestX-ray14 / DUTS 显著性数据集微调
+    - 显著性目标检测研究，可复用方法论
+    - 思路：yolov8n 预训练 → DUTS / MSRA10K 显著性数据集微调
     - 简历话术：
-      "基于显著性目标检测研究经验，将 YOLOv8 迁移到医学影像病灶检测，
-       在 ChestX-ray14 上 mAP@0.5 达 XX%"
+      "基于显著性目标检测研究经验，将 YOLOv8 迁移到自然场景显著物体检测，
+       在 DUTS 上 mAP@0.5 达 XX%，支持医疗影像/自动驾驶等场景扩展"
     """
 
-    # 胸片常见病灶（CXR14 类别）
-    CXR14_CLASSES = [
-        "Atelectasis", "Cardiomegaly", "Effusion", "Infiltration",
-        "Mass", "Nodule", "Pneumonia", "Pneumothorax",
-        "Consolidation", "Edema", "Emphysema", "Fibrosis",
-        "Pleural_Thickening", "Hernia",
+    # 自然场景常见显著物体（DUTS 数据集 10 类）
+    SALIENT_CLASSES = [
+        "person", "car", "dog", "cat", "bicycle",
+        "bird", "chair", "dining_table", "potted_plant", "sofa",
     ]
+
+    # 可选领域扩展（注释中说明，不写死在代码）
+    EXTENSION_DATASETS = {
+        "通用显著性": "DUTS, MSRA10K, ECSSD, HKU-IS",
+        "医疗影像": "ChestX-ray14, BraTS（可选扩展场景）",
+        "自动驾驶": "KITTI, BDD100K（可选扩展场景）",
+    }
 
     def __init__(
         self,
@@ -338,26 +342,26 @@ class SalientYOLODetector(YOLODetector):
         super().__init__(model_name, custom_weights, device)
         logger.info(
             "[SalientYOLODetector] 已启用显著性目标检测迁移模式\n"
-            "  - 输入：医学影像 / 自然场景\n"
-            "  - 类别：ChestX-ray14 14 类（可配置）\n"
-            "  - 输出：DetectionResult（含显著性热力图区域）"
+            "  - 输入：自然场景图像（可扩展到医疗/自动驾驶）\n"
+            "  - 类别：10 类常见显著物体（可配置）\n"
+            "  - 输出：DetectionResult + Top-K 显著性区域"
         )
 
     def detect_salient_region(
-        self, image_path: str, top_k: int = 5
+        self, source: str, top_k: int = 5
     ) -> dict[str, Any]:
         """
         显著性区域检测（结合 YOLO 检测 + 显著性排序）
         返回 Top-K 显著性区域
         """
-        result = self.detect(image_path)
+        result = self.detect(source)
         sorted_boxes = sorted(
             result.boxes, key=lambda b: b.confidence, reverse=True
         )
         top_boxes = sorted_boxes[:top_k]
 
         return {
-            "image": image_path,
+            "image": source,
             "salient_regions": [b.to_dict() for b in top_boxes],
             "num_candidates": len(result.boxes),
             "note": "Top-K 显著性区域，可用于人眼注意力热力图",
@@ -491,13 +495,13 @@ class HybridDetector:
         self.uncertainty_threshold = uncertainty_threshold
 
     def detect_with_fallback(
-        self, image_path: str, vlm_prompt: str | None = None
+        self, source: str, vlm_prompt: str | None = None
     ) -> dict[str, Any]:
         """
         联合检测：YOLO 先检，置信度低的让 VLM 兜底
         """
         # Step 1：YOLO 检测
-        yolo_result = self.yolo.detect(image_path)
+        yolo_result = self.yolo.detect(source)
         uncertain = yolo_result.get_low_confidence_boxes(
             self.uncertainty_threshold
         )
@@ -510,12 +514,12 @@ class HybridDetector:
                 "请简洁列出（每行一个：'类别 - 位置'）"
             )
             chat_result = self.vlm.chat_with_image(
-                text=vlm_prompt, image_path=image_path
+                text=vlm_prompt, image_path=source
             )
             vlm_findings.append(chat_result.content)
 
         return {
-            "image": image_path,
+            "image": source,
             "yolo_boxes": [b.to_dict() for b in yolo_result.boxes],
             "yolo_high_conf_count": len(yolo_result.boxes) - len(uncertain),
             "uncertain_boxes_for_vlm": [b.to_dict() for b in uncertain],
