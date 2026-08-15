@@ -56,6 +56,7 @@ data/test_medical.jpg
 data/*.zip
 data/*.tar
 data/*.tar.gz
+data/annotations/
 
 # ===== 模型权重（太大，放 Git LFS 或网盘）=====
 *.pt
@@ -88,4 +89,5 @@ upload_tmp/
 
 # ===== 文档构建 =====
 docs/_build/
+docs/images
 site/
