@@ -1,0 +1,13 @@
+{"idx": 88, "text": "酒店的服务很热情，对于我们的客房要求总能及时回应。 地理位置不错，离中山北街很近，吃饭方便。...", "true_label": 1, "votes": [1, 1, 1], "final": 1, "confidence": "high", "is_match": true, "tokens": 1458}
+{"idx": 89, "text": "第一次来当当买书，选择这本书看上的是它的销售量和顾客的评价。老实说，这本书没有多大的可读性，我儿子只...", "true_label": 0, "votes": [0, 0, 0], "final": 0, "confidence": "high", "is_match": true, "tokens": 1900}
+{"idx": 90, "text": "我三个星期前定的货，配送公司星期六送货我没在公司，他们说三天后会再送，结果竟然给我当作退货处理了，耽...", "true_label": 0, "votes": [0, 0, 0], "final": 0, "confidence": "high", "is_match": true, "tokens": 1808}
+{"idx": 91, "text": "这种酒店如果也算3星级酒店的话，我真的无话可说了。 从入住开始就不舒服： 因为没定到4星级的酒店，所...", "true_label": 0, "votes": [0, 0, 0], "final": 0, "confidence": "high", "is_match": true, "tokens": 3173}
+{"idx": 92, "text": "原以为Windows Vista 家庭普通版的软件很难用的，兼容性差，谁知一上手还是很好用，原来想装...", "true_label": 1, "votes": [1, 1, 1], "final": 1, "confidence": "high", "is_match": true, "tokens": 1766}
+{"idx": 93, "text": "淋浴头竟然自己掉了下来，后来修理好了。马桶一直堵。请求修理两次，态度很好，无奈技术不佳，最终没有解决...", "true_label": 0, "votes": [0, 0, 0], "final": 0, "confidence": "high", "is_match": true, "tokens": 1864}
+{"idx": 94, "text": "本书其实没说什么，也看不出价值在哪，作者倒是牛，把西医批评的一无是处，感觉就是根本不懂科学...", "true_label": 0, "votes": [0, 0, 0], "final": 0, "confidence": "high", "is_match": true, "tokens": 1708}
+{"idx": 95, "text": "不错，帮朋友选的，朋友比较满意，就是USB接口少了，而且全是在左边，图片有误...", "true_label": 1, "votes": [1, 1, 1], "final": 1, "confidence": "high", "is_match": true, "tokens": 1710}
+{"idx": 96, "text": "住过这么多酒店，从来没有住过这么小旧脏老臭的“大床房”！一进门就被一股臭味熏了出来，开了一天的窗户也...", "true_label": 0, "votes": [0, 0, 0], "final": 0, "confidence": "high", "is_match": true, "tokens": 2347}
+{"idx": 97, "text": "我一直使用ThinkPad，从最初的380D到T系列，再到最近公司配的X200，得心应手。本台机子是...", "true_label": 1, "votes": [1, 1, 1], "final": 1, "confidence": "high", "is_match": true, "tokens": 1639}
+{"idx": 98, "text": "房间细小、地毡恐布，空调不够、服务差劣。应立刻取消预订服务。 免费注册 网站导航 宾馆索引 服务说明...", "true_label": 0, "votes": [0, 0, 0], "final": 0, "confidence": "high", "is_match": true, "tokens": 1847}
+{"idx": 99, "text": "酒店很大，服务太差，Ａ楼房间也老，下次再也不住了。环境很好，打高尔夫的或许可以忍忍吧。...", "true_label": 1, "votes": [0, 0, 0], "final": 0, "confidence": "high", "is_match": false, "tokens": 1856}
+{"idx": 100, "text": "配置很好,按键敲得爽,完美屏,超满意啊!比电脑城便宜多了,很爽啊!!!...", "true_label": 1, "votes": [1, 1, 1], "final": 1, "confidence": "high", "is_match": true, "tokens": 1538}
